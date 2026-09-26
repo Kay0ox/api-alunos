@@ -72,6 +72,23 @@ class AlunoController {
                 });
         }
     }
+      async delete(request, response) {
+    try {
+        const { id } = request.params;
+
+        await alunoService.delete(id);
+
+        return response.status(204).send();
+
+    } catch (e) {
+        return response
+            .status(e.statusCode || 500)
+            .json({
+                message: e.message
+            });
+    }
+    }
+    
 
 }
 
