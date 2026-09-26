@@ -1,46 +1,77 @@
 const alunoService = require("../services/AlunoService");
-        
 
-class AlunoController{
-    
-    async findMany(request, response){
-        let {page, pageSize, orderBy, order} = request.query;
-       
+class AlunoController {
+
+    async findMany(request, response) {
+        let { page, pageSize, orderBy, order } = request.query;
+
         page ||= 1;
         pageSize ||= 10;
-        orderBy ||="id";
-        order ||="asc";
+        orderBy ||= "id";
+        order ||= "asc";
 
         const resultado = await alunoService.findMany(
-            page, pageSize,orderBy,order
+            page,
+            pageSize,
+            orderBy,
+            order
         );
-        return response.status(200).json(resultado);
 
-        
+        return response.status(200).json(resultado);
     }
 
-    async create(request, response){
-        try{
+
+    async create(request, response) {
+        try {
             const aluno = await alunoService.create(request.body);
-            return response.status(201).json({aluno});
-        }catch(error){
-            return response.status(400).json({error: error.message});
+
+            return response.status(201).json({ aluno });
+
+        } catch (error) {
+            return response.status(400).json({
+                error: error.message
+            });
         }
     }
 
-    async findUnique(request, response){
-    try{
-        const { id } = request.params;
 
-        const aluno = await alunoService.findUnique(id);
+    async findUnique(request, response) {
+        try {
+            const { id } = request.params;
 
-        return response.status(200).json(aluno);
-    }catch(e){
-        return response
-            .status(e.statusCode || 500)
-            .json({ message: e.message });
+            const aluno = await alunoService.findUnique(id);
+
+            return response.status(200).json(aluno);
+
+        } catch (e) {
+            return response
+                .status(e.statusCode || 500)
+                .json({
+                    message: e.message
+                });
+        }
     }
-}
+
+
+    async update(request, response) {
+        try {
+            const { id } = request.params;
+            const dados = request.body;
+
+            const alunoAtualizado = await alunoService.update(id, dados);
+
+            return response
+                .status(200)
+                .json(alunoAtualizado);
+
+        } catch (e) {
+            return response
+                .status(e.statusCode || 500)
+                .json({
+                    message: e.message
+                });
+        }
+    }
 
 }
 

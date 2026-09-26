@@ -2,6 +2,7 @@ const { skip, dmmfToRuntimeDataModel } = require("@prisma/client/runtime/client"
 const prisma = require("../databases/prisma");
 const AlunoInvalidoError = require("../errors/AlunoInvalidoError");
 const AlunoNaoEncontradoError = require("../errors/AlunoNaoEncontradoError");
+const EmailDuplicadoError = require("../errors/EmailDuplicadoError");
 
 class AlunoService{
 
@@ -63,6 +64,57 @@ class AlunoService{
 
         return aluno;
     }
+
+    async update(id, dados){
+    const aluno = await prisma.aluno.findUnique({
+        where: {
+            id: Number(id)
+        }
+    });
+
+    if(!aluno){
+        throw new AlunoNaoEncontradoError();
+    }
+
+    const { nome, email } = dados;
+
+    if(!nome && !email){
+        // Reaproveitamos AlunoInvalidoError porque o problema
+        // continua sendo entrada inválida de dados do aluno.
+        throw new AlunoInvalidoError("Informe nome e/ou email para atualizar");
+    }
+
+    if(email){
+        const alunoComMesmoEmail = await prisma.aluno.findUnique({
+            where: {
+                email: email
+            }
+        });
+
+        if(alunoComMesmoEmail && alunoComMesmoEmail.id !== Number(id)){
+            throw new EmailDuplicadoError();
+        }
+    }
+
+    const dadosAtualizacao = {};
+
+    if(nome){
+        dadosAtualizacao.nome = nome;
+    }
+
+    if(email){
+        dadosAtualizacao.email = email;
+    }
+
+    const alunoAtualizado = await prisma.aluno.update({
+        where: {
+            id: Number(id)
+        },
+        data: dadosAtualizacao
+    });
+
+    return alunoAtualizado;
+}
 
 }
 
