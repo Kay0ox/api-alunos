@@ -10,4 +10,6 @@ router.get("/", (request, response, next)=>{
 }, alunoController.findMany);
 router.post("/", validarAluno, alunoController.create);
 
+router.get("/:id", alunoController.findUnique);
+
 module.exports = router;

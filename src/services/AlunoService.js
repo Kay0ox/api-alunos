@@ -1,6 +1,7 @@
 const { skip, dmmfToRuntimeDataModel } = require("@prisma/client/runtime/client");
 const prisma = require("../databases/prisma");
 const AlunoInvalidoError = require("../errors/AlunoInvalidoError");
+const AlunoNaoEncontradoError = require("../errors/AlunoNaoEncontradoError");
 
 class AlunoService{
 
@@ -48,6 +49,22 @@ class AlunoService{
 
         return novoAluno;
     }
+
+    async findUnique(id){
+        const aluno = await prisma.aluno.findUnique({
+            where: {
+                id: Number(id)
+            }
+        });
+
+        if(!aluno){
+            throw new AlunoNaoEncontradoError();
+        }
+
+        return aluno;
+    }
+
 }
+
 
 module.exports = new AlunoService();
